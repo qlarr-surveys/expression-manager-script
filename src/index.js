@@ -107,6 +107,14 @@ function isSafe(node, allowedVariables, extraParams = []) {
             end: node.end,
           },
         ];
+      } else if (node.callee.type != "MemberExpression") {
+        return [
+          {
+            message: "functions are meant to be only invoked as instance methods",
+            start: node.start,
+            end: node.end,
+          },
+        ];
       } else if (isStaticMethod(node.callee)) {
         calleeResult = isSafeStaticFunction(node.callee);
       } else {

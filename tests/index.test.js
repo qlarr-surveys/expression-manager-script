@@ -8,7 +8,7 @@ test("All literals are accepted", () => {
   expect(validateInstruction("/d+/")).toStrictEqual([]);
 });
 
-test("some javascript Identifiers are accepted", () => {
+test("some javascript built-in Identifiers are accepted", () => {
   expect(validateInstruction("NaN")).toStrictEqual([]);
   expect(validateInstruction("undefined")).toStrictEqual([]);
   expect(validateInstruction("Infinity")).toStrictEqual([]);
@@ -86,12 +86,12 @@ test("Some static methods are allowed", () => {
     validateInstruction('Object.keys({"name":"Bob", "age": 23 + 1})')
   ).toStrictEqual([]);
   expect(
-    validateInstruction("QlarrScripts.isVoid(x.value)", ["x.value"])
+    validateInstruction("QlarrScripts.isVoid(Q1.value)", ["Q1.value"])
   ).toStrictEqual([]);
 });
 
 test("instance methods are allowed", () => {
-  expect(validateInstruction("x.value.length()", ["x.value"])).toStrictEqual(
+  expect(validateInstruction("Q1.value.length()", ["Q1.value"])).toStrictEqual(
     []
   );
   expect(validateInstruction("[1,2,3,4,5].length()")).toStrictEqual([]);
@@ -99,6 +99,11 @@ test("instance methods are allowed", () => {
     validateInstruction("[1,2,3,4,5].filter(function(x){return x%2==0})")
   ).toStrictEqual([]);
   expect(validateInstruction('"kabaka".charAt(20)')).toStrictEqual([]);
+  expect(validateInstruction('kabaka.charAt(20)')).toStrictEqual([ {
+    end: 6,
+    message: "unidetified: kabaka",
+    start: 0,
+  }]);
 });
 
 test("Some static properties are  allowed", () => {
@@ -109,42 +114,46 @@ test("Some static properties are  allowed", () => {
 });
 
 test("length is the only instance property allowed", () => {
-  expect(validateInstruction("x.value.length", ["x.value"])).toStrictEqual([]);
+  expect(validateInstruction("Q1.value.length", ["Q1.value"])).toStrictEqual([]);
   expect(validateInstruction("[1,2,3,4,5].length")).toStrictEqual([]);
-  expect(validateInstruction("x.value.constructor", ["x.value"])).toStrictEqual(
+  expect(validateInstruction("Q1.value.constructor", ["Q1.value"])).toStrictEqual(
     [
       {
-        end: 19,
+        end: 20,
         message: "unIdentified member property",
-        start: 8,
+        start: 9,
       },
     ]
   );
 });
 
 test("computed properties and functions are not allowed", () => {
-  expect(validateInstruction("x.value.length", ["x.value"])).toStrictEqual([]);
-  expect(validateInstruction('x.value["length"]', ["x.value"])).toStrictEqual([
+  expect(validateInstruction("Q1.value.length", ["Q1.value"])).toStrictEqual([]);
+  expect(validateInstruction('Q1.value["length"]', ["Q1.value"])).toStrictEqual([
     {
-      end: 17,
+      end: 18,
       message: "Computed member expressions are not allowed",
       start: 0,
     },
   ]);
-  // this is the alternative
-  expect(
-    validateInstruction('QlarrScripts.safeAccess(x.value,"length")', [
-      "x.value",
-    ])
-  ).toStrictEqual([]);
 });
+
+test("If you have to use a computed properties You must use QlarrScripts.safeAccess", () => {
+    // this is the alternative
+    expect(
+      validateInstruction('QlarrScripts.safeAccess(Q1.value,"length")', [
+        "Q1.value",
+      ])
+      
+    ).toStrictEqual([]);
+  });
 
 test("some unary operators are allowed", () => {
   expect(validateInstruction("-1")).toStrictEqual([]);
   expect(validateInstruction("!true")).toStrictEqual([]);
   expect(validateInstruction("+1")).toStrictEqual([]);
   expect(validateInstruction("~1")).toStrictEqual([]);
-  expect(validateInstruction("typeof x.value", ["x.value"])).toStrictEqual([]);
+  expect(validateInstruction("typeof Q1.value", ["Q1.value"])).toStrictEqual([]);
   expect(validateInstruction("-x")).toStrictEqual([
     {
       end: 2,
@@ -237,9 +246,9 @@ test("variable and function declarations, assignments and updates are not allowe
       start: 0,
     },
   ]);
-  expect(validateInstruction("x.value = 3", ["x.value"])).toStrictEqual([
+  expect(validateInstruction("Q1.value = 3", ["Q1.value"])).toStrictEqual([
     {
-      end: 11,
+      end: 12,
       message: "Assignments are not allowed",
       start: 0,
     },
