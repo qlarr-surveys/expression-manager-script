@@ -1,4 +1,6 @@
-export const unaryOperators = ["+", "-", "!", "~"];
+
+export const allowedIdentifiers = ["undefined", "NaN", "Infinity", "-Infinity"];
+export const unaryOperators = ["+", "-", "!", "~", "typeof"];
 
 // static methods
 export const identifiersWithNew = ["Date", "RegExp"];
@@ -100,22 +102,6 @@ export const numberStaticProperties = [
 ];
 
 export const allowedProperties = [
-  // RegExp properties
-  "dotAll", // RegExp
-  "flags", // RegExp
-  "global", // RegExp
-  "hasIndices", // RegExp
-  "ignoreCase", // RegExp
-  "lastIndex", // RegExp
-  "multiline", // RegExp
-  "source", // RegExp
-  "sticky", // RegExp
-  "unicode", // RegExp
-  "unicodeSets", // RegExp
-
-  // String properties
-  "length", // String
-
   // Array properties
   "length", // Array
 ];
@@ -138,20 +124,13 @@ export const allowedMethods = [
 
   // Array methods
   "at", // Array
-  "concat", // Array
-  "every", // Array
-  "fill", // Array
   "filter", // Array
   "find", // Array
   "findIndex", // Array
   "findLast", // Array
   "findLastIndex", // Array
-  "flat", // Array
-  "flatMap", // Array
-  "forEach", // Array
   "includes", // Array
   "indexOf", // Array
-  "join", // Array
   "keys", // Array
   "lastIndexOf", // Array
   "map", // Array

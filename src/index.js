@@ -1,6 +1,7 @@
 import * as acorn from "acorn";
 
 import {
+  allowedIdentifiers,
   unaryOperators,
   identifiersWithNew,
   identifiersWithStaticMethods,
@@ -57,7 +58,10 @@ function isSafe(node, allowedVariables, extraParams = []) {
     case "ExpressionStatement":
       return isSafe(node.expression, allowedVariables, extraParams);
     case "Identifier":
-      if (extraParams.indexOf(node.name) == -1) {
+      if (
+        allowedIdentifiers.indexOf(node.name) == -1 &&
+        extraParams.indexOf(node.name) == -1
+      ) {
         return [
           {
             message: "unidetified: " + node.name,
@@ -88,6 +92,8 @@ function isSafe(node, allowedVariables, extraParams = []) {
           isSafe(element, allowedVariables, extraParams)
         )
       );
+
+    case "ArrowFunctionExpression":
     case "FunctionExpression":
       const params = node.params.map((x) => x.name).concat(extraParams);
       return isSafe(node.body, allowedVariables, params);
@@ -145,9 +151,9 @@ function isSafe(node, allowedVariables, extraParams = []) {
       } else {
         return [
           {
-            message: "unIdentified member expression",
-            start: node.start,
-            end: node.end,
+            message: "unIdentified member property",
+            start: node.property.start,
+            end: node.property.end,
           },
         ];
       }
@@ -183,7 +189,6 @@ function isSafe(node, allowedVariables, extraParams = []) {
         isSafe(node.right, allowedVariables, extraParams)
       );
     case "ConditionalExpression":
-    case "IfStatement":
       return mergeResults(
         isSafe(node.test, allowedVariables, extraParams),
         isSafe(node.consequent, allowedVariables, extraParams),
@@ -208,7 +213,62 @@ function isSafe(node, allowedVariables, extraParams = []) {
           },
         ];
       }
+    case "IfStatement":
+      return [
+        {
+          message: "If statements are not allowed",
+          start: node.start,
+          end: node.end,
+        },
+      ];
+    case "ForOfStatement":
+    case "ForStatement":
+    case "DoWhileStatement":
+    case "WhileStatement":
+    case "ForInStatement":
+      return [
+        {
+          message: "Loops are not allowed",
+          start: node.start,
+          end: node.end,
+        },
+      ];
 
+    case "VariableDeclaration":
+      return [
+        {
+          message: "Variable Declarations are not allowed",
+          start: node.start,
+          end: node.end,
+        },
+      ];
+
+    case "UpdateExpression":
+      return [
+        {
+          message: "Update Expressions are not allowed",
+          start: node.start,
+          end: node.end,
+        },
+      ];
+      FunctionDeclaration;
+
+    case "FunctionDeclaration":
+      return [
+        {
+          message: "Function Declarations are not allowed",
+          start: node.start,
+          end: node.end,
+        },
+      ];
+    case "AssignmentExpression":
+      return [
+        {
+          message: "Assignments are not allowed",
+          start: node.start,
+          end: node.end,
+        },
+      ];
     default:
       return [
         {
@@ -384,8 +444,6 @@ function validateProgram(node, allowedVariables, extraParams) {
   return result;
 }
 
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = validateCode;
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports = validateCode;
 }
-
-
