@@ -8,7 +8,7 @@ import {
   identifiersWithStaticProperties,
   dateStaticMethods,
   mathStaticMethods,
-  frankieStaticMethods,
+  qlarrStaticMethods,
   numberStaticMethods,
   objectStaticMethods,
   mathStaticProperties,
@@ -366,7 +366,7 @@ function isSafeStaticFunction(calleeNode) {
         return [];
       }
     case "FrankieScripts":
-      if (frankieStaticMethods.indexOf(calleeNode.property.name) == -1) {
+      if (qlarrStaticMethods.indexOf(calleeNode.property.name) == -1) {
         return [
           {
             message:
