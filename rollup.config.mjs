@@ -6,9 +6,9 @@ export default {
   input: 'src/index.js',  // Your entry point
   output: [
     {
-      file: 'dist/qlarr-script-validation.min.js',  // UMD format, minified
+      file: 'dist/expression-manager-script.min.js',  // UMD format, minified
       format: 'umd',
-      name: 'ScriptValidation',
+      name: 'EMScript',
       plugins: [terser()],
     }
   ],
