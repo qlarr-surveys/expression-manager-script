@@ -732,7 +732,7 @@ interface SequenceExpression <: Expression {
 ```
 
 A sequence expression, i.e., a comma-separated sequence of expressions.
-### Validation: Not allowed
+$${\color{red}Validation: Not allowed}$$
 
 ```js
 interface Pattern <: Node { }
