@@ -28,7 +28,25 @@ export function validateCode(instructionList) {
 function isSafeCode(code, allowedVariables) {
   try {
     const ast = acorn.parse(code, { ecmaVersion: 2020 });
-    // Traverse sthe AST to check if it contains any unsafe constructs
+    if (!ast || typeof ast !== "object") {
+      return [];
+    }
+    if (
+      ast.type != "Program" ||
+      ast.body.length !== 1 ||
+      ast.body[0]?.type !== "ExpressionStatement"
+    ) {
+      console.error(ast)
+      console.log(ast.type)
+      console.log(ast.body.length)
+      return [
+        {
+          message: "This script must be a single ExpressionStatement",
+          start: 0,
+          end: ast.end,
+        },
+      ];
+    }
     return isSafe(ast, allowedVariables);
   } catch (error) {
     console.log(error);
@@ -44,10 +62,6 @@ function isSafeCode(code, allowedVariables) {
 }
 
 function isSafe(node, allowedVariables, extraParams = []) {
-  if (!node || typeof node !== "object") {
-    return; // Empty nodes or non-object nodes are safe
-  }
-
   console.log(node.type);
   switch (node.type) {
     // if program validate body
@@ -64,7 +78,7 @@ function isSafe(node, allowedVariables, extraParams = []) {
       ) {
         return [
           {
-            message: "unidetified: " + node.name,
+            message: node.name +  " is not defined",
             start: node.start,
             end: node.end,
           },
@@ -110,7 +124,8 @@ function isSafe(node, allowedVariables, extraParams = []) {
       } else if (node.callee.type != "MemberExpression") {
         return [
           {
-            message: "functions are meant to be only invoked as instance methods",
+            message:
+              "functions are meant to be only invoked as instance methods",
             start: node.start,
             end: node.end,
           },
@@ -259,7 +274,6 @@ function isSafe(node, allowedVariables, extraParams = []) {
           end: node.end,
         },
       ];
-      FunctionDeclaration;
 
     case "FunctionDeclaration":
       return [

@@ -29,14 +29,14 @@ test("object and Array expressions are allowed, each key and value will be valid
   expect(validateInstruction('undefined == {"name":x}')).toStrictEqual([
     {
       end: 22,
-      message: "unidetified: x",
+      message: "x is not defined",
       start: 21,
     },
   ]);
   expect(validateInstruction("[1,2,3,4,x]")).toStrictEqual([
     {
       end: 10,
-      message: "unidetified: x",
+      message: "x is not defined",
       start: 9,
     },
   ]);
@@ -99,11 +99,13 @@ test("instance methods are allowed", () => {
     validateInstruction("[1,2,3,4,5].filter(function(x){return x%2==0})")
   ).toStrictEqual([]);
   expect(validateInstruction('"kabaka".charAt(20)')).toStrictEqual([]);
-  expect(validateInstruction('kabaka.charAt(20)')).toStrictEqual([ {
-    end: 6,
-    message: "unidetified: kabaka",
-    start: 0,
-  }]);
+  expect(validateInstruction("kabaka.charAt(20)")).toStrictEqual([
+    {
+      end: 6,
+      message: "kabaka is not defined",
+      start: 0,
+    },
+  ]);
 });
 
 test("Some static properties are  allowed", () => {
@@ -114,50 +116,57 @@ test("Some static properties are  allowed", () => {
 });
 
 test("length is the only instance property allowed", () => {
-  expect(validateInstruction("Q1.value.length", ["Q1.value"])).toStrictEqual([]);
+  expect(validateInstruction("Q1.value.length", ["Q1.value"])).toStrictEqual(
+    []
+  );
   expect(validateInstruction("[1,2,3,4,5].length")).toStrictEqual([]);
-  expect(validateInstruction("Q1.value.constructor", ["Q1.value"])).toStrictEqual(
+  expect(
+    validateInstruction("Q1.value.constructor", ["Q1.value"])
+  ).toStrictEqual([
+    {
+      end: 20,
+      message: "unIdentified member property",
+      start: 9,
+    },
+  ]);
+});
+
+test("computed properties and functions are not allowed", () => {
+  expect(validateInstruction("Q1.value.length", ["Q1.value"])).toStrictEqual(
+    []
+  );
+  expect(validateInstruction('Q1.value["length"]', ["Q1.value"])).toStrictEqual(
     [
       {
-        end: 20,
-        message: "unIdentified member property",
-        start: 9,
+        end: 18,
+        message: "Computed member expressions are not allowed",
+        start: 0,
       },
     ]
   );
 });
 
-test("computed properties and functions are not allowed", () => {
-  expect(validateInstruction("Q1.value.length", ["Q1.value"])).toStrictEqual([]);
-  expect(validateInstruction('Q1.value["length"]', ["Q1.value"])).toStrictEqual([
-    {
-      end: 18,
-      message: "Computed member expressions are not allowed",
-      start: 0,
-    },
-  ]);
-});
-
 test("If you have to use a computed properties You must use QlarrScripts.safeAccess", () => {
-    // this is the alternative
-    expect(
-      validateInstruction('QlarrScripts.safeAccess(Q1.value,"length")', [
-        "Q1.value",
-      ])
-      
-    ).toStrictEqual([]);
-  });
+  // this is the alternative
+  expect(
+    validateInstruction('QlarrScripts.safeAccess(Q1.value,"length")', [
+      "Q1.value",
+    ])
+  ).toStrictEqual([]);
+});
 
 test("some unary operators are allowed", () => {
   expect(validateInstruction("-1")).toStrictEqual([]);
   expect(validateInstruction("!true")).toStrictEqual([]);
   expect(validateInstruction("+1")).toStrictEqual([]);
   expect(validateInstruction("~1")).toStrictEqual([]);
-  expect(validateInstruction("typeof Q1.value", ["Q1.value"])).toStrictEqual([]);
+  expect(validateInstruction("typeof Q1.value", ["Q1.value"])).toStrictEqual(
+    []
+  );
   expect(validateInstruction("-x")).toStrictEqual([
     {
       end: 2,
-      message: "unidetified: x",
+      message: "x is not defined",
       start: 1,
     },
   ]);
@@ -170,7 +179,7 @@ test("binary operations are allowed", () => {
   expect(validateInstruction("1/x")).toStrictEqual([
     {
       end: 3,
-      message: "unidetified: x",
+      message: "x is not defined",
       start: 2,
     },
   ]);
@@ -200,7 +209,7 @@ test("loops not allowed", () => {
   expect(validateInstruction("while(true){1}")).toStrictEqual([
     {
       end: 14,
-      message: "Loops are not allowed",
+      message: "This script must be a single ExpressionStatement",
       start: 0,
     },
   ]);
@@ -209,7 +218,7 @@ test("loops not allowed", () => {
   ).toStrictEqual([
     {
       end: 46,
-      message: "Loops are not allowed",
+      message: "This script must be a single ExpressionStatement",
       start: 0,
     },
   ]);
@@ -218,18 +227,28 @@ test("loops not allowed", () => {
   ).toStrictEqual([
     {
       end: 53,
-      message: "Loops are not allowed",
+      message: "This script must be a single ExpressionStatement",
       start: 0,
     },
   ]);
 });
 
 test("variable and function declarations, assignments and updates are not allowed", () => {
-  expect(validateInstruction("let x = 3")).toStrictEqual([
+  expect(
+    validateInstruction(
+      "Q1.value.map((value) => {let x = 3; return value * x})",
+      ["Q1.value"]
+    )
+  ).toStrictEqual([
     {
-      end: 9,
+      end: 35,
       message: "Variable Declarations are not allowed",
-      start: 0,
+      start: 25,
+    },
+    {
+      end: 52,
+      message: "x is not defined",
+      start: 51,
     },
   ]);
   expect(validateInstruction("x++")).toStrictEqual([
@@ -239,11 +258,20 @@ test("variable and function declarations, assignments and updates are not allowe
       start: 0,
     },
   ]);
-  expect(validateInstruction("function min(x){return x -1 }")).toStrictEqual([
+  expect(
+    validateInstruction("Q2.value.map(x=>{function get(){}return get();})", [
+      "Q2.value",
+    ])
+  ).toStrictEqual([
     {
-      end: 29,
+      end: 33,
       message: "Function Declarations are not allowed",
-      start: 0,
+      start: 17,
+    },
+    {
+      end: 45,
+      message: "global methods are not permitted",
+      start: 40,
     },
   ]);
   expect(validateInstruction("Q1.value = 3", ["Q1.value"])).toStrictEqual([
