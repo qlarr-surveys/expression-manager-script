@@ -5,16 +5,16 @@ This library defines and validates the **dynamic instructions** used in survey d
 
 ## How It Works
 
-The library parses the instruction code into an [Abstract Syntax Tree](https://github.com/estree/estree/blob/master/es5.md) (AST) using [acorn](https://github.com/acornjs/acorn) and validates the tree nodes recursively some against rules like:
+The library parses the instruction code into an [Abstract Syntax Tree](https://github.com/estree/estree/blob/master/es5.md) (AST) using [acorn](https://github.com/acornjs/acorn) and validates the tree nodes recursively against rules listed in [full-spec.md](https://github.com/qlarr-surveys/expression-manager-script/blob/main/full-spec.md). Here are the most important:
 - The dynamic instruction must be an [ExpressionStatement](https://github.com/estree/estree/blob/master/es5.md#expressions) (a statement that returns a value).
 - Permitted Nodes:
   - Literals: (simple values like: `1, "a", true`)
-  - Binary Expressions: `1 + 2` `c * b` _left and right expressions are validated recursively_
-  - Logical expressions: like `a || b` _left and right expressions are validated recursively_
-  - Unary expressions: Like `!true`, `!a` or `Q1.relevance && Q1.value` 
-  - [Object Expression](https://github.com/estree/estree/blob/master/es5.md#objectexpression): to declare an object `{name:"Alfred",age:1}` _properties (key and values) are validated recursively_
-  - [Array Expression](https://github.com/estree/estree/blob/master/es5.md#arrayexpression): to declare an array `[1,2,3]` _elements are validated recursively_
-  - [conditional expression](https://github.com/estree/estree/blob/master/es5.md#conditionalexpression), i.e., a ternary `?`/`:` expression. test, consequent and alternate are validated recursively_
+  - BinaryExpressions: `1 + 2` `c * b` _left and right expressions are validated recursively_
+  - LogicalExpressions: like `a || b` _left and right expressions are validated recursively_
+  - UnaryExpressions: Like `!true`, `!a` or `Q1.relevance && Q1.value` 
+  - ObjectExpression: to declare an object `{name:"Alfred",age:1}` _properties (key and values) are validated recursively_
+  - ArrayExpression: to declare an array `[1,2,3]` _elements are validated recursively_
+  - ConditionalExpression, i.e., a ternary `?`/`:` expression. test, consequent and alternate are validated recursively_
 - Prohibited nodes:
   - Variable or function declarations
   - Variable assigment or update
