@@ -37,11 +37,9 @@ This Library exposes one function: `function validateCode(instructionList)`
 
 ## Usage
 
-This library is used in script-engine module, inside [Expression Manager](https://github.com/qlarr-surveys/expression-manager) to validate the custom dynamic instructions in survey designs.
-
 To use locally
 1. Clone the repo
 2. run `npm install`
 3. Add tests to tests/index.test.js and run `npm test` (This is the best way to test if a given instruction will be accepted during validation)
 4. Build library using `npm run build`
-5. To use new file in Expression Manager: copy output file dist/expression-manager-script.min.js to /expression-manager/scriptengine/src/main/resources/expression-manager-script.min.js and rebuild the expression manager jar file
+5. To use they newly file in Expression Manager: copy output file dist/expression-manager-script.min.js to /expression-manager/scriptengine/src/main/resources/expression-manager-script.min.js and rebuild the expression manager jar file
