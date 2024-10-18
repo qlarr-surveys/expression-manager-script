@@ -56,7 +56,6 @@ This document specifies how each ESTree AST node type is validated.
   - [CallExpression](#callexpression)
   - [NewExpression](#newexpression)
   - [SequenceExpression](#sequenceexpression)
-- [Patterns](#patterns)
 
 
 # Identifier
@@ -732,8 +731,4 @@ interface SequenceExpression <: Expression {
 ```
 
 A sequence expression, i.e., a comma-separated sequence of expressions.
-$${\color{red}Validation: Not allowed}$$
-
-```js
-interface Pattern <: Node { }
-```
+### Validation:  Not allowed
