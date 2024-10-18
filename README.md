@@ -24,9 +24,9 @@ The library parses the instruction code into an [Abstract Syntax Tree](https://g
   - Functions (Call Expression): to call a function... only some common static methods (`Date.parse()`, or `Math.abs(-1)`) and instance methods are allowed (`"abc".length()`, or `[1,2,3].at(0)`)...
 - Also any other node is by default not allowed
 
-### API
+## API
 
-This Library exposes one instruction `function validateCode(instructionList)`
+This Library exposes one function: `function validateCode(instructionList)`
 - **Input**: The instructionList is an JSON array of objects, each containing 2 properties:
   - scrip`: the JavaScript instruction script
   - allowedVariables: the survey variables that the script can access
@@ -35,27 +35,13 @@ This Library exposes one instruction `function validateCode(instructionList)`
    - start, end: locations of the error within the instruction script
 
 
-### Example Usage
+## Usage
 
-```javascript
-const { validateInstructions } = require('qlarr-surveys-script-validation');
+This library is used in script-engine module, inside [Expression Manager](https://github.com/qlarr-surveys/expression-manager) to validate the custom dynamic instructions in survey designs.
 
-const instructionList = [
-  {
-    script: 'answer.length > 10', // example script to count words
-    allowedVariables: ['answer'] // the variables accessible in this script
-  }
-];
-
-const errors = validateInstructions(instructionList);
-
-if (errors.length > 0) {
-  errors.forEach((error) => {
-    console.error(`Validation Error: ${error.message}, at position ${error.start}-${error.end}`);
-  });
-} else {
-  console.log("All instructions are valid!");
-}
-```
-
----
+To use locally
+1. Clone the repo
+2. run `npm install`
+3. Add tests to tests/index.test.js and run `npm test` (This is the best way to test if a given instruction will be accepted during validation)
+4. Build library using `npm run build`
+5. To use new file in Expression Manager: copy output file dist/expression-manager-script.min.js to /expression-manager/scriptengine/src/main/resources/expression-manager-script.min.js and rebuild the expression manager jar file
